@@ -14,6 +14,10 @@ module.exports = {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            gridTemplateColumns: {
+                // Simple 12 column grid
+                '12': 'repeat(12, minmax(0, 1fr))',
+            },
         },
     },
 

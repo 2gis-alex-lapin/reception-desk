@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use App\Http\Controllers\LdapTestCotroller;
+use App\Http\Controllers\DashboardController;
+
+// Livewire components
+use App\Http\Livewire\Tasks as TasksController;
+use App\Http\Livewire\Orders as OrdersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +29,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified'
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 Route::post('/login', function (Illuminate\Http\Request $request) {
@@ -34,7 +38,7 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
         'password' => ['required'],
     ]);
 
-    if (Auth::guard('ldap')->attempt($credentials)) {
+    if (Auth::guard('web')->attempt($credentials)) {
         // Аутентификация успешна
         return redirect()->intended('/dashboard');
     } else {
@@ -44,3 +48,10 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
         ]);
     }
 })->middleware('guest')->name('login');
+
+Route::get('/ldap-test', [LdapTestCotroller::class, 'index']);
+
+// Route::get('/orders/{slug}', [OrdersController::class, 'index']);
+
+Route::get('/orders/{slug}', OrdersController::class)->middleware('auth');
+Route::get('tasks', TasksController::class)->middleware('auth');
