@@ -7,7 +7,10 @@ use App\Http\Controllers\DashboardController;
 
 // Livewire components
 use App\Http\Livewire\Tasks as TasksController;
-use App\Http\Livewire\Orders as OrdersController;
+use App\Http\Livewire\Orders;
+use App\Http\Livewire\FileDropzone;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\FilesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +35,11 @@ Route::middleware([
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
+Route::get('/lang/{locale}', function ($locale) {
+    session()->put('locale', $locale);
+    return redirect()->back();
+})->name('locale');
+
 Route::post('/login', function (Illuminate\Http\Request $request) {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
@@ -50,8 +58,16 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
 })->middleware('guest')->name('login');
 
 Route::get('/ldap-test', [LdapTestCotroller::class, 'index']);
+Route::get('/test', function(){
+    return view('layouts.app')->with([
+        'slot' => view('upload')
+    ]);
+});
 
-// Route::get('/orders/{slug}', [OrdersController::class, 'index']);
+Route::post('/orders/{slug}', [OrderController::class, 'store']);
 
-Route::get('/orders/{slug}', OrdersController::class)->middleware('auth');
+Route::get('/orders/{slug}', Orders::class)->middleware('auth');
 Route::get('tasks', TasksController::class)->middleware('auth');
+
+Route::post('/files/store', [FilesController::class,'store'])->name('store');
+Route::post('/files/upload', [FilesController::class,'upload'])->name('upload');

@@ -1,10 +1,7 @@
-<div class="p-6 lg:p-8 bg-white border-b border-gray-200">
+<div class="p-6 lg:p-8 bg-white dark:bg-gray-500 border-b border-gray-200">
     <!-- <x-application-logo class="block h-12 w-auto" /> -->
 
-    <h1 class="mt-8 text-2xl font-medium text-gray-900 my-4">
-        Reception Desk
-    </h1>
-    <div class="grid grid-cols-4 gap-4">
+    <div class="grid grid-flow-row grid-cols-4 gap-4">
         
         @foreach($tasks as $task)
 
@@ -13,8 +10,8 @@
                     <div class="w-24 mx-auto">
                         {!! $task->icon !!}
                     </div>
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white text-center">{{ $task->title }}</h5>
-                    <p class="font-normal text-gray-700 dark:text-gray-400 text-center">{{ $task->description }}</p>
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white text-center">{{ trans($task->title) }}</h5>
+                    <p class="font-normal text-gray-700 dark:text-gray-400 text-center">{{ trans($task->description) }}</p>
                 </a>
             </div>
 

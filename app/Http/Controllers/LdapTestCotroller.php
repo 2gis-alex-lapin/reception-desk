@@ -94,12 +94,12 @@ class LdapTestCotroller extends Controller
 
         // dd($printers);
 
-        Mail::raw('Text to e-mail', function($msg)
-        {
-            $msg->from(env('MAIL_FROM_ADDR'), 'Laravel');
+        // Mail::raw('Text to e-mail', function($msg)
+        // {
+        //     $msg->from(env('MAIL_FROM_ADDR'), 'Laravel');
          
-            $msg->to('a.lapin@taraz.2gis.kz')->subject('Test Email');
-        });        
+        //     $msg->to('a.lapin@taraz.2gis.kz')->subject('Test Email');
+        // });        
 
         // $data = ['message' => 'This is a test!'];
         // Mail::to('a.lapin@taraz.2gis.kz')->send(new TestEmail($data));

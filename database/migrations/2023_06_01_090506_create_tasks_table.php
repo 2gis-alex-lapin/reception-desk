@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->longText('icon')->nullable();
+            $table->bigInteger('performer');
             $table->timestamps();
         });
     }
