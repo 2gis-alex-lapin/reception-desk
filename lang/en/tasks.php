@@ -2,6 +2,7 @@
 
 return [
     'tasks' => 'Tasks',
+    'statuses' => 'Status',
     'titles' => [
         'get-promo' => 'Get PM',
         'add-user' => 'New user account',

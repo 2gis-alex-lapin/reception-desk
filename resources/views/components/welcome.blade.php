@@ -1,7 +1,7 @@
 <div class="p-6 lg:p-8 bg-white dark:bg-gray-500 border-b border-gray-200">
     <!-- <x-application-logo class="block h-12 w-auto" /> -->
 
-    <div class="grid grid-flow-row grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         
         @foreach($tasks as $task)
 

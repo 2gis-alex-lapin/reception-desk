@@ -2,6 +2,7 @@
 
 return [
     'tasks' => 'Задачи',
+    'statuses' => 'Статус задач',
     'titles' => [
         'get-promo' => 'Заказать РМ',
         'add-user' => 'Новый сотрудник',

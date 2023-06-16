@@ -24,7 +24,8 @@ use App\Http\Controllers\FilesController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::middleware([
@@ -64,9 +65,9 @@ Route::get('/test', function(){
     ]);
 });
 
-Route::post('/orders/{slug}', [OrderController::class, 'store']);
+Route::post('/orders/{slug}', [Orders::class, 'store']);
+Route::get('/orders/{slug}', [Orders::class, 'render'])->middleware('auth');
 
-Route::get('/orders/{slug}', Orders::class)->middleware('auth');
 Route::get('tasks', TasksController::class)->middleware('auth');
 
 Route::post('/files/store', [FilesController::class,'store'])->name('store');
