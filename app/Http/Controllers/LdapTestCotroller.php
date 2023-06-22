@@ -13,10 +13,28 @@ use LdapRecord\Models\Attributes\AccountControl;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
 
+use App\Models\User;
+use App\Models\Order;
+
 
 class LdapTestCotroller extends Controller
 {
     protected $ldap;
+    
+    public function test()
+    {
+        // $user = User::where('id', \Auth::id())->first();
+        $of = Order::find(1)->files;
+        // $user_projects_array = [];
+        // foreach ($user->projects as $user_project) {
+        //     $user_projects_array[] = $user_project->legal;
+        // }
+
+        // $order_creator = Order::find(1)->user->name;
+        // $project_id = $user->projects->first()->id;
+        
+        dd($of);
+    }
 
     public function index()
     {

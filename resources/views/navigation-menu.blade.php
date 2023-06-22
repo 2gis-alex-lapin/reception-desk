@@ -15,7 +15,7 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('tasks.tasks') }}
                     </x-nav-link>
-                    <x-nav-link class="disabled" href="#">
+                    <x-nav-link class="disabled" href="{{ route('orders-status') }}">
                         {{ __('tasks.statuses') }}
                     </x-nav-link>
                 </div>
@@ -172,7 +172,7 @@
             <div class="mt-3 space-y-1">
                 <!-- Account Management -->
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
+                {{ __('auth.profile') }}
                 </x-responsive-nav-link>
 
                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
@@ -187,7 +187,7 @@
 
                     <x-responsive-nav-link href="{{ route('logout') }}"
                                    @click.prevent="$root.submit();">
-                        {{ __('Log Out') }}
+                            {{ __('auth.logout') }}
                     </x-responsive-nav-link>
                 </form>
 

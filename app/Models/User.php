@@ -13,6 +13,9 @@ use Laravel\Sanctum\HasApiTokens;
 // use Illuminate\Contracts\Auth\Authenticatable;
 use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
 use LdapRecord\Laravel\Auth\LdapAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class User extends Authenticatable implements LdapAuthenticatable
 {
@@ -74,4 +77,21 @@ class User extends Authenticatable implements LdapAuthenticatable
         //     $msg->to('a.lapin@taraz.2gis.kz')->subject('Test Email');
         // });        
     }
+
+    /**
+     * The projects that belong to the user.
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class);
+    }
+
+    /**
+     * The projects that belong to the user.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'user_id', 'id');
+    }
+ 
 }

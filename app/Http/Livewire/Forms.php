@@ -22,7 +22,7 @@ class Forms extends Component
         $form_id = Form::where('name', $this->name)->first()->id;
         $form_fields = [];
         // get forms fields
-        $forms_fields = FormsFields::where('form_id', $form_id)->get();
+        $forms_fields = FormsFields::where('form_id', $form_id)->orderBy('priority', 'asc')->get();
         // get form fields
         foreach ($forms_fields as $form_field) {
             $form_fields[] = $form_field->field_id;

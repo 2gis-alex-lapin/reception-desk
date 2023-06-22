@@ -9,6 +9,8 @@ use App\Models\Order;
 use App\Models\File;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Project;
+use App\Models\Position;
 use Illuminate\Http\Request;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
@@ -39,59 +41,51 @@ class Orders extends Component
     public function store(Request $request)
     {
         $data = $request->all();
-        
+        $files_ids = [];
+
+        if ($request->file) {
+            foreach ($request->file as $file) {
+                $fileU = new File;
+                $this->files[] = $file;
+                $name = time().rand(1,100).'.'.$file->extension();
+                $store_path = ('orders');
+                $file->storeAs($store_path,$name);
+                $file_url = asset('storage/'.$store_path.'/'.$name);
+                $fileU->name = $name;
+                $fileU->path = $file_url;
+                $fileU->save(); 
+                $files_ids[] = $fileU->id;
+                $data['attachments'][] = $file_url;
+            }
+        }
+
+        $order_title = __('orders.titles.'.$data['task_id']);
+        $user = User::where('id', Auth::id())->first();
+        $task = Task::where('slug', $data['task_id'])->first();
+        $project_id = $user->projects->first()->id;
+        $project_title = $user->projects->first()->title;
+        $user_id = $user->id;
+        $task_type = $task->type;
+        $form_id = 0;
+        $data = Arr::except($data,['file','_token']);
+        $mail_title = '';
+        $data_json = json_encode($data);
+
         switch ($data['task_id']) {
             case 'get-promo':
-                if ($request->file) {
-                    foreach ($request->file as $file) {
-                        $fileU = new File;
-                        $this->files[] = $file;
-                        // $file->store('public/orders');
-                        $name = time().rand(1,100).'.'.$file->extension();
-                        $path = public_path('public/orders/') . $name;
-                        $file->storeAs('public/orders/', $name);
-                        $fileU->name = $name;
-                        $fileU->path = $path;
-                        $fileU->save(); 
-                    }
-                }
-                $data = Arr::except($data,['file','_token']);
-                $task_id = Task::where('slug', $data['task_id'])->first()->id;
-                $project_id = 1;
-                $user_id = Auth::id();
-                $user = User::where('id', $user_id)->first();
-                $form_id = 1;
-                $order_data = json_encode($data);
                 $company_name = $data['company-name'];
                 $niche = $data['niche'];
-                $work = '';
-                $jobs = $data['send-promo'];
-                foreach ($jobs as $job) {
-                    $work .= $job . ',';
-                }
-        
+                $list = implode(',', $data['send-promo']);
+                $mail_title = $project_title . ', ' . $company_name . ', ' . $list;
+
+
                 $message = <<<EOL
                 Компания: $company_name
                 Сфера деятельности: $niche
-                Что сделать: $work
+                Что сделать: $list
                 Задачу выдал: $user->name
+                mailto: <a href="$user->email">$user->email</a>
                 EOL;
-                Mail::raw($message, function($msg) use ($company_name, $work)
-                {
-                    $msg->from(env('MAIL_FROM_ADDR'), 'Reception Desk');
-                 
-                    $msg->to('a.lapin@taraz.2gis.kz')->to('2gis_alapin+fmfo98oezd3tulgkhbce@boards.trello.com')->subject('Design: ' . $work . ' ' . $company_name);
-                });        
-        
-        
-                // 2gis_alapin+fmfo98oezd3tulgkhbce@boards.trello.com
-                $order = new Order;
-                $order->task_id = $task_id;
-                $order->project_id = $project_id;
-                $order->user_id = $user_id;
-                $order->form_id = $form_id;
-                $order->data = $order_data;
-                $order->save();
         
                 session()->flash('flash.banner', 'Заказ успешно добавлен');
                 session()->flash('flash.bannerStyle', 'success');
@@ -100,80 +94,93 @@ class Orders extends Component
             
             case 'add-user':
 
-                $data = Arr::except($data,['file','_token']);
-                $task_id = Task::where('slug', $data['task_id'])->first()->id;
-                $project_id = 1;
-                $user_id = Auth::id();
-                $user = User::where('id', $user_id)->first();
-                $form_id = 2;
-                $order_data = json_encode($data);
                 $firstname = $data['firstname'];
                 $lastname = $data['lastname'];
                 $middlename = $data['middlename'];
                 $phone = $data['phone'];
                 $birthday = $data['birthday'];
+                $position = Position::where('slug', $data['position'])->first()->title;
+                $project_title = Project::where('name', $data['project'])->first()->title;
+                $project = $data['project'];
+                $mail_title = $project_title . ', ' . $order_title . ' на должность ' . $position;
 
                 $message = <<<EOL
+                Проект: $project_title
                 Имя: $firstname
                 Фамилия: $lastname
                 Отчество: $middlename
                 Телефон: $phone
                 Дата рождения: $birthday
+                Должность: $position
                 Разместил(а): $user->name
                 EOL;
-                Mail::raw($message, function($msg) use ($firstname, $lastname, $middlename, $phone, $user)
-                {
-                    $msg->from(env('MAIL_FROM_ADDR'), 'Reception Desk');
-                 
-                    $msg->to('a.lapin@taraz.2gis.kz')->to('2gis_alapin+fmfo98oezd3tulgkhbce@boards.trello.com')->subject('AD: ' . $firstname . ' ' . $lastname);
-                });        
 
-                $order = new Order;
-                $order->task_id = $task_id;
-                $order->project_id = $project_id;
-                $order->user_id = $user_id;
-                $order->form_id = $form_id;
-                $order->data = $order_data;
-                $order->save();
 
                 session()->flash('flash.banner', 'Заявка на создание аккаунта успешно добавлена');
                 session()->flash('flash.bannerStyle', 'success');
 
                 break;
             case 'remove-user':
-
-                $data = Arr::except($data,['file','_token']);
-                $task_id = Task::where('slug', $data['task_id'])->first()->id;
-                $project_id = 1;
-                $user_id = Auth::id();
-                $user = User::where('id', $user_id)->first();
-                $form_id = 3;
-                $order_data = json_encode($data);
                 $username = $data['username'];
                 $reason = $data['remove-reason'];
+                $project = Project::where('name', $data['project'])->first();
                 
                 $message = <<<EOL
                 Аккаунт: $username
                 Причина: $reason
+                Проект: $project->title
                 Разместил(а): $user->name
                 EOL;
-                Mail::raw($message, function($msg) use ($username, $reason)
-                {
-                    $msg->from(env('MAIL_FROM_ADDR'), 'Reception Desk: remove user');
-                 
-                    $msg
-                        ->to('a.lapin@taraz.2gis.kz')
-                        // ->to('2gis_alapin+fmfo98oezd3tulgkhbce@boards.trello.com')
-                        ->subject('AD: ' . $username . ' ' . $reason);
-                });        
+    
+
+                session()->flash('flash.banner', 'Заявка на удаление пользователя размещена');
+                session()->flash('flash.bannerStyle', 'success');
 
                 break; 
             default:
                 # code...
                 break;
         }
+
+        Mail::raw($message, function($msg) use ($mail_title, $task_type)
+        {
+            $msg->from(env('MAIL_FROM_ADDR'), 'Reception Desk');
+            
+            // $msg->to('a.lapin@taraz.2gis.kz')->subject("$task_type: " . $mail_title);
+            $msg->to('a.lapin@taraz.2gis.kz')->to('2gis_alapin+fmfo98oezd3tulgkhbce@boards.trello.com')->subject("$task_type: " . $mail_title);
+        });        
+
+        $order = new Order;
+        $order->task_id = $task->id;
+        $order->project_id = $project_id;
+        $order->user_id = $user_id;
+        $order->form_id = $form_id;
+        $order->data = $data_json;
+        $order->save();
+        $order->files()->sync($files_ids);
           
         return back();
+    }
+
+    public function status()
+    {
+        $order_id = collect(request()->segments())->last();
+        $order = Order::where('id', $order_id)->first();
+        
+        return view('livewire.orders.status')->with([
+            'title' => $this->title,
+            'order' => $order,
+            'data' => json_decode($order->data, true),
+        ]);
+    }
+
+    public function statusTable()
+    {
+        
+        return view('livewire.orders.status-table')->with([
+            'title' => $this->title,
+            'orders' => Order::where('user_id', Auth::id())->get(),
+        ]);
     }
 
 }

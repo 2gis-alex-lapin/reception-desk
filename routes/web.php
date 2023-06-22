@@ -59,11 +59,10 @@ Route::post('/login', function (Illuminate\Http\Request $request) {
 })->middleware('guest')->name('login');
 
 Route::get('/ldap-test', [LdapTestCotroller::class, 'index']);
-Route::get('/test', function(){
-    return view('layouts.app')->with([
-        'slot' => view('upload')
-    ]);
-});
+Route::get('/test', [LdapTestCotroller::class, 'test']);
+
+Route::get('/orders/status', [Orders::class, 'statusTable'])->name('orders-status');
+Route::get('/orders/status/{slug}', [Orders::class, 'status'])->name('order-status');
 
 Route::post('/orders/{slug}', [Orders::class, 'store']);
 Route::get('/orders/{slug}', [Orders::class, 'render'])->middleware('auth');
